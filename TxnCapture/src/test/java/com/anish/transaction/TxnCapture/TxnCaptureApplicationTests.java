@@ -1,10 +1,10 @@
-package com.transaction.service.project;
+package com.anish.transaction.TxnCapture;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ProjectApplicationTests {
+class TxnCaptureApplicationTests {
 
 	@Test
 	void contextLoads() {
