@@ -32,7 +32,6 @@ public class TransactionController {
     @GetMapping("/transactions/{id}")
     public ResponseEntity<?> getTransactionsById(@PathVariable String id){
         TransactionModel transaction = transactionService.getTransactionById(id);
-        if(transaction == null) throw new TransactionNotFoundException("Transaction not found for id:"+id);
         return ResponseEntity.status(HttpStatus.OK).body(transaction);
     }
 

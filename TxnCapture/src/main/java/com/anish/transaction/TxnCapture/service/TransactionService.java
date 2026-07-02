@@ -1,46 +1,41 @@
 package com.anish.transaction.TxnCapture.service;
 
 import com.anish.transaction.TxnCapture.dto.CreateTransactionRequest;
+import com.anish.transaction.TxnCapture.exception.TransactionNotFoundException;
 import com.anish.transaction.TxnCapture.model.TransactionModel;
-import org.springframework.http.ResponseEntity;
+import com.anish.transaction.TxnCapture.repositories.TransactionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class TransactionService {
 
-    private final Map<String, TransactionModel> map = new ConcurrentHashMap<>();
+    private final TransactionRepository transactionRepository;
+
+    public TransactionService(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
+    }
 
     public TransactionModel postTransaction(CreateTransactionRequest request){
         String txnId = request.getTransactionUUID();
-        if(map.containsKey(txnId)) return map.get(txnId);
-
+        if(transactionRepository.existsById(txnId)) return getTransactionById(txnId);
         TransactionModel model = new TransactionModel();
         model.setTransactionUUID(txnId);
         model.setTransactionAmount(request.getTransactionAmount());
         model.setCreatedAt(LocalDateTime.now());
         model.setTransactionStatus("PENDING");
 
-        map.put(txnId, model);
-
-        return model;
+        return transactionRepository.save(model);
     }
 
     public TransactionModel getTransactionById(String id){
-        if(map.containsKey(id)){
-            return map.get(id);
-        }
-        return null;
+        return transactionRepository.findById(id).orElseThrow(() -> new TransactionNotFoundException("Transaction not found for id:"+id));
     }
 
     public List<TransactionModel> getAllTransactions() {
-        return map.values().stream().toList();
+        return transactionRepository.findAll();
     }
 
 }
